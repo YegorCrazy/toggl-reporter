@@ -1,0 +1,22 @@
+{
+	"SpreadSheetID" : "1wEspdTT4dE4JLVVaZSUKPNVPoIEz6C0L5HMrxPSbQn0",
+	
+	"StartDay" : "01",
+	"StartMonth" : "05",
+	"StartYear" : "2020",
+	
+	"EndDay" : "25",
+	"EndMonth" : "06",
+	"EndYear" : "2020",
+	
+	"Workers" : [
+		{
+			"Name" : "Sasha Mikhailov ",
+			"APICode" : "b49c6f54a251e5068d1468d40d167070"
+		},
+		{
+			"Name" : "Misha Alexandrov",
+			"APICode" : "0c4a7c68c6cda54d4c8a013ffe5a1af2"
+		}
+	]	
+}
