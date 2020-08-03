@@ -4,10 +4,14 @@ from pprint import pprint
 import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials #для связи с Google Sheets
 import httplib2
+import json
 
-spreadsheet_id = '1wEspdTT4dE4JLVVaZSUKPNVPoIEz6C0L5HMrxPSbQn0' #ID таблицы
+with open('config.json') as config_file:
+    data = json.load(config_file)
 
-CREDENTIALS_FILE = 'toggl-reporter-b806babbaa89.json'
+spreadsheet_id = data['SpreadSheetID'] #ID таблицы
+
+CREDENTIALS_FILE = data["CredentialsFile"]
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'])
 httpAuth = credentials.authorize(httplib2.Http()) #авторизуемся в гугле
 
@@ -129,3 +133,20 @@ def getLists(ID): #получение информации о существую
         if request['sheets'][i]['properties']['sheetId'] != 1000:
             ids.append(request['sheets'][i]['properties']['sheetId'])
     return ids
+
+def createNewTable():
+    spreadsheet = service.spreadsheets().create(body = {
+    'properties': {'title': 'Toggl', 'locale': 'ru_RU'},
+    'sheets': [{'properties': {'sheetType': 'GRID',
+                               'sheetId': 30,
+                               'title': 'Начальный лист',
+                               'gridProperties': {'rowCount': 8, 'columnCount': 5}}}]
+    }).execute()
+    driveService = apiclient.discovery.build('drive', 'v3', http = httpAuth)
+    shareRes = driveService.permissions().create(
+        fileId = spreadsheet["spreadsheetId"],
+        body = {'type': 'anyone', 'role': 'writer'},  # доступ на чтение кому угодно
+        fields = 'id'
+    ).execute()
+    spreadsheet_id = spreadsheet["spreadsheetId"]
+    return spreadsheet["spreadsheetId"]

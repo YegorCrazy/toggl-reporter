@@ -5,6 +5,8 @@ import requests
 from urllib.parse import urlencode
 from requests.auth import HTTPBasicAuth #для связи с Toggl
 
+import sys
+
 import commands as com #файл с моими функциями
 
 class Task:
@@ -28,10 +30,18 @@ with open('config.json') as config_file:
     try:
         data = json.load(config_file)
     except json.decoder.JSONDecodeError: #открываем файл конфигурации
-        print('С файлом что-то не так.')
+        print('С файлом config.json что-то не так.')
         sys.exit()
 
 spreadsheet_id = data['SpreadSheetID']
+
+if spreadsheet_id == "":
+    print("Работа с таблицей выполняется впервые. Создаем таблицу...")
+    spreadsheet_id = com.createNewTable()
+    data['SpreadSheetID'] = spreadsheet_id
+    with open('config.json', 'w') as config_file:
+        json.dump(data, config_file, indent=4)
+    print("ID новой таблицы - " + spreadsheet_id)
 
 start_date = data['StartYear']+'-'+data['StartMonth']+'-'+data['StartDay'] #получаем из config данные
 end_date = data['EndYear']+'-'+data['EndMonth']+'-'+data['EndDay']
@@ -141,7 +151,7 @@ com.AddDelExe()
 
 com.AddValue('Данные','A1','H1',[['Работник','Задание','Описание','Проект','Начало','Конец','Длительность','В часах']])
 
-UTC = +3 #TODO: часовой пояс, добавить возможность ввода
+UTC = data["TimeZoneUTC"] #часовой пояс
 
 begin = 2
 for i in range(len(tasks)):
@@ -151,7 +161,7 @@ for i in range(len(tasks)):
         G = ''
         H = ''
         if tasks[i].stops[j] != 'Еще не окончено':
-            stop = '="'+com.timeForm(tasks[i].stops[j])+'" + '+str(UTC)+'/24' #на случай неоконченного задания
+            stop = '="'+com.timeForm(tasks[i].stops[j])+'" '+UTC+'/24' #на случай неоконченного задания
             G = '=F'+str(begin)+'-E'+str(begin)
             H = '=(F'+str(begin)+'-E'+str(begin)+')*24'
         
@@ -162,7 +172,7 @@ for i in range(len(tasks)):
                    tasks[i].task_code,
                    tasks[i].descriptions[j],
                    tasks[i].abr,
-                   '="'+com.timeForm(tasks[i].starts[j])+'" + '+str(UTC)+'/24', #ввод значений полей
+                   '="'+com.timeForm(tasks[i].starts[j])+'" '+UTC+'/24', #ввод значений полей
                    stop,
                    G,
                    H]]
