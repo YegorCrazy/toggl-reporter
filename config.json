@@ -1,7 +1,7 @@
 {
     "TimeZoneUTC": "+3",
     "CredentialsFile": "toggl-reporter-b806babbaa89.json",
-    "SpreadSheetID": "1RryYRMfl6-n0Ugw0_LYVeFPkekggxgRnzr_cDTgtZbI",
+    "SpreadSheetID": "",
     "StartDay": "01",
     "StartMonth": "05",
     "StartYear": "2020",
