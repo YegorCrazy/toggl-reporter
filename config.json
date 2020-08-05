@@ -1,6 +1,6 @@
 {
     "TimeZoneUTC": "+3",
-    "CredentialsFile": "toggl-reporter-b806babbaa89.json",
+    "CredentialsFile": "",
     "SpreadSheetID": "",
     "StartDay": "01",
     "StartMonth": "05",
@@ -11,11 +11,11 @@
     "Workers": [
         {
             "Name": "Sasha Mikhailov ",
-            "APICode": "b49c6f54a251e5068d1468d40d167070"
+            "APICode": ""
         },
         {
             "Name": "Misha Alexandrov",
-            "APICode": "0c4a7c68c6cda54d4c8a013ffe5a1af2"
+            "APICode": ""
         }
     ]
 }
