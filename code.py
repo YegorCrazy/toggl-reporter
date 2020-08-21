@@ -1,5 +1,6 @@
 import time
 import json #дополнительно
+import re
 
 import requests
 from urllib.parse import urlencode
@@ -59,6 +60,11 @@ tasks = []
 for i in range(len(data['Workers'])):
     
     api_token = data['Workers'][i]['APICode']
+
+    prohibited = data['Workers'][i]['Prohibited']
+    prohibited_compiled = []
+    for j in prohibited:
+        prohibited_compiled.append(re.compile(j))
         
     r = requests.get(url, headers=headers, auth=HTTPBasicAuth(api_token,'api_token'))
     
@@ -77,47 +83,58 @@ for i in range(len(data['Workers'])):
         #print(session)
         try:
             desc = session['description'] #получаем описание и делим его на слова
-            if len(desc)>maxl:
-                maxl = len(desc)
-            desc1 = desc.split()
-            task = ''
-            for i in range(len(desc1)):
-                defis = 0
-                let = 0
-                numb = 0
-                word = desc1[i]
-                for j in range(len(word)):
-                    simb = word[j]
-                    if simb.isalpha():
-                        let=1
-                    if simb.isdigit():
-                        numb=1
-                    if simb=='-':
-                        defis=1
-                if defis==1 and numb ==1 and let==1: #ищем код задачи по наличию букв, цифр и дефиса
-                    task=word
-            fl=0;
-            for t in range(len(tasks)):
-                if task==tasks[t].task_code:
-                    fl+=1
-                    tasks[t].new_worker(name)
-                    tasks[t].new_description(session['description']) #если такая задача есть - добавляем работника, описание и длительность
-                    tasks[t].new_start(session['start'])
+
+            allowed = True
+            for j in prohibited_compiled:
+                if re.fullmatch(j, desc) != None:
+                    allowed = False
+
+            if allowed == True:
+            
+                if len(desc)>maxl:
+                    maxl = len(desc)
+                desc1 = desc.split()
+                task = ''
+                for i in range(len(desc1)):
+                    defis = 0
+                    let = 0
+                    numb = 0
+                    word = desc1[i]
+                    for j in range(len(word)):
+                        simb = word[j]
+                        if simb.isalpha():
+                            let=1
+                        if simb.isdigit():
+                            numb=1
+                        if simb=='-':
+                            defis=1
+                    if defis==1 and numb ==1 and let==1: #ищем код задачи по наличию букв, цифр и дефиса
+                        task=word
+                fl=0;
+                for t in range(len(tasks)):
+                    if task==tasks[t].task_code:
+                        fl+=1
+                        tasks[t].new_worker(name)
+                        tasks[t].new_description(session['description']) #если такая задача есть - добавляем работника, описание и длительность
+                        tasks[t].new_start(session['start'])
+                        try:
+                            tasks[t].new_stop(session['stop'])
+                        except KeyError:
+                            tasks[t].new_stop('Еще не окончено')
+                        #print('existing')
+                if fl==0:
+                    tasks.append(Task(task))
+                    tasks[-1].new_worker(name)
+                    tasks[-1].new_description(session['description']) #если ее нет - добавляем ее и информацию
+                    tasks[-1].new_start(session['start'])
                     try:
-                        tasks[t].new_stop(session['stop'])
+                        tasks[-1].new_stop(session['stop'])
                     except KeyError:
-                        tasks[t].new_stop('Еще не окончено')
-                    #print('existing')
-            if fl==0:
-                tasks.append(Task(task))
-                tasks[-1].new_worker(name)
-                tasks[-1].new_description(session['description']) #если ее нет - добавляем ее и информацию
-                tasks[-1].new_start(session['start'])
-                try:
-                    tasks[-1].new_stop(session['stop'])
-                except KeyError:
-                    tasks[-1].new_stop('Еще не окончено')
-                #print('new')
+                        tasks[-1].new_stop('Еще не окончено')
+                    #print('new')
+            else:
+                print("Некоторые задания исключены как подходящие шаблонам.")
+                
         except KeyError: #исключение на отсутствие описания
             print('У некоторых записей '+name+' нет описания.')
 
@@ -128,10 +145,13 @@ for i in range(len(tasks)):
         descript = tasks[i].descriptions[j]
         while len(descript)<maxl:
             descript+=' '
-        print(descript,end='\t') #вывод данных в консоль
+        print(descript,end='\t')  #вывод данных в консоль
         print(tasks[i].abr,end='\t')
-        print(tasks[i].starts[j],end='\t')
-        print(tasks[i].stops[j])
+        print(com.timeForm(tasks[i].starts[j]),end='\t')
+        if tasks[i].stops[j]!= "Еще не окончено":
+            print(com.timeForm(tasks[i].stops[j])) #вывод данных в удобном виде
+        else:
+            print(tasks[i].stops[j])
 
 print()
 print('Работа с Toggl окончена, заполняем Google-таблицу...')
@@ -190,3 +210,5 @@ com.UpdSize(0,4,5,150) #увеличить клетки
 com.AddDelExe()
 
 print('Ссылка на таблицу: '+'https://docs.google.com/spreadsheets/d/' + spreadsheet_id)
+
+a = input()

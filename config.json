@@ -5,17 +5,26 @@
     "StartDay": "01",
     "StartMonth": "05",
     "StartYear": "2020",
-    "EndDay": "25",
-    "EndMonth": "06",
+    "EndDay": "23",
+    "EndMonth": "08",
     "EndYear": "2020",
     "Workers": [
         {
-            "Name": "Sasha Mikhailov ",
-            "APICode": ""
+		"Name": "Sasha Mikhailov ",
+		"APICode": "",
+		"Prohibited" : [
+			"ab*",
+			"ac*"
+		]
+
         },
         {
-            "Name": "Misha Alexandrov",
-            "APICode": ""
+		"Name": "Misha Alexandrov",
+		"APICode": "",
+		"Prohibited" : [
+			"ab*",
+			"ac*"
+		]
         }
     ]
 }

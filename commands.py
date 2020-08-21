@@ -5,9 +5,14 @@ import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials #для связи с Google Sheets
 import httplib2
 import json
+import sys
 
 with open('config.json') as config_file:
-    data = json.load(config_file)
+    try:
+        data = json.load(config_file)
+    except json.decoder.JSONDecodeError: #открываем файл конфигурации
+        print('С файлом config.json что-то не так.')
+        sys.exit()
 
 spreadsheet_id = data['SpreadSheetID'] #ID таблицы
 
